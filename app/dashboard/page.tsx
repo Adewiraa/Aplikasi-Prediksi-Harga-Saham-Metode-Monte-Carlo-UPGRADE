@@ -112,7 +112,7 @@ export default function DashboardPage() {
             </Link>
             <Link 
               href="/dashboard/validasi" 
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-800/40 border border-indigo-700/30 px-5 py-3 text-sm font-bold text-white hover:bg-indigo-850/50 transition duration-150"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-800/40 border border-indigo-700/30 px-5 py-3 text-sm font-bold text-white hover:bg-indigo-800/50 transition duration-150"
             >
               Lihat Pengujian Validasi
             </Link>
@@ -160,9 +160,9 @@ export default function DashboardPage() {
           <p className="mt-2 text-xs text-slate-400 font-medium">
             Kategori:{' '}
             <span className={`font-bold ${
-              stats.avgMapeStatus === 'Sangat Akurat' ? 'text-emerald-650' : 
+              stats.avgMapeStatus === 'Sangat Akurat' ? 'text-emerald-600' : 
               stats.avgMapeStatus === 'Baik' ? 'text-blue-650' : 
-              stats.avgMapeStatus === 'Layak' ? 'text-yellow-650' : 'text-slate-500'
+              stats.avgMapeStatus === 'Layak' ? 'text-yellow-600' : 'text-slate-500'
             }`}>
               {stats.avgMapeStatus}
             </span>
@@ -176,7 +176,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-bold text-slate-900">Daftar Saham Terpopuler</h3>
-            <Link href="/dashboard/saham" className="text-xs text-indigo-650 hover:text-indigo-500 font-bold flex items-center gap-1">
+            <Link href="/dashboard/saham" className="text-xs text-indigo-600 hover:text-indigo-500 font-bold flex items-center gap-1">
               Lihat Semua <ArrowRight size={12} />
             </Link>
           </div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                       <td className="py-3.5 text-right">
                         <Link 
                           href={`/dashboard/prediksi?kode=${stock.kode_saham}`} 
-                          className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 border border-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-650 hover:bg-indigo-600 hover:text-white transition duration-150 animate-shadow"
+                          className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 border border-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-600 hover:bg-indigo-600 hover:text-white transition duration-150 animate-shadow"
                         >
                           Prediksi
                         </Link>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
 
         {/* Kolom 3: Catatan Akademik */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-650 border border-slate-200">
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-600 border border-slate-200">
             <ShieldCheck size={18} className="text-indigo-600" />
           </div>
           <h3 className="text-base font-bold text-slate-900">Catatan Validitas Skripsi</h3>

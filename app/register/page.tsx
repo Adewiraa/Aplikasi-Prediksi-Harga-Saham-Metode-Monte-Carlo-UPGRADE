@@ -45,7 +45,6 @@ export default function RegisterPage() {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        // Jika auto-confirm aktif di Supabase, user bisa langsung login
         if (data.session) {
           setSuccessMsg('Pendaftaran berhasil! Mengarahkan ke dashboard...');
           setTimeout(() => {
@@ -53,7 +52,6 @@ export default function RegisterPage() {
           }, 1500);
         } else {
           setSuccessMsg('Pendaftaran berhasil! Silakan langsung login (atau cek email jika verifikasi email aktif).');
-          // Reset form
           setName('');
           setEmail('');
           setPassword('');
@@ -69,7 +67,7 @@ export default function RegisterPage() {
   if (authLoading || user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-650 border-t-transparent"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -77,14 +75,14 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
       {/* Background soft gradients */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-80 h-80 bg-purple-200/40 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-100 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-80 h-80 bg-purple-100 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
-        <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-slate-900">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center">
+        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Daftar Akun Baru
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-550">
+        <p className="mt-2 text-sm text-slate-500 font-medium">
           Buat akun untuk mengakses modul prediksi Monte Carlo
         </p>
       </div>
@@ -93,13 +91,13 @@ export default function RegisterPage() {
         <div className="bg-white border border-slate-200 py-8 px-6 shadow-xl rounded-2xl sm:px-10">
           <form className="space-y-6" onSubmit={handleRegister}>
             {errorMsg && (
-              <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-650">
+              <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-600 font-medium">
                 {errorMsg}
               </div>
             )}
 
             {successMsg && (
-              <div className="rounded-xl bg-emerald-50 border border-emerald-250 p-3 text-sm text-emerald-650">
+              <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-sm text-emerald-600 font-medium">
                 {successMsg}
               </div>
             )}
@@ -190,9 +188,9 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-slate-550">
+            <p className="text-sm text-slate-600 font-medium">
               Sudah memiliki akun?{' '}
-              <Link href="/login" className="font-semibold text-indigo-650 hover:text-indigo-550">
+              <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
                 Masuk disini
               </Link>
             </p>

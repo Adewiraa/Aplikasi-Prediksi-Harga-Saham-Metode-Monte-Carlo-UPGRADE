@@ -263,7 +263,7 @@ export default function PrediksiPage() {
         {/* Panel Form Input */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm h-fit space-y-6">
           <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Compass size={18} className="text-indigo-650" /> Konfigurasi Simulasi
+            <Compass size={18} className="text-indigo-600" /> Konfigurasi Simulasi
           </h3>
           <form onSubmit={handleSimulate} className="space-y-4">
             <div>
@@ -272,7 +272,7 @@ export default function PrediksiPage() {
                 required
                 value={selectedKode}
                 onChange={e => setSelectedKode(e.target.value)}
-                className="w-full rounded-xl border border-slate-350 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               >
                 <option value="" disabled>Pilih Kode Saham</option>
                 {stocks.map(s => (
@@ -292,7 +292,7 @@ export default function PrediksiPage() {
                 max={10000}
                 value={simulations}
                 onChange={e => setSimulations(parseInt(e.target.value))}
-                className="w-full rounded-xl border border-slate-350 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
               <span className="text-3xs text-slate-400 mt-1 block font-medium">Rekomendasi: 1.000 simulasi untuk kestabilan statistik</span>
             </div>
@@ -321,15 +321,15 @@ export default function PrediksiPage() {
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Parameter Model (GBM)</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                  <span className="block text-3xs font-bold text-slate-450 uppercase">Drift Harian ($\mu$)</span>
+                  <span className="block text-3xs font-bold text-slate-400 uppercase">Drift Harian ($\mu$)</span>
                   <span className="text-sm font-extrabold text-indigo-600 font-mono">{result.parameters.driftHarianPersen}</span>
                 </div>
                 <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                  <span className="block text-3xs font-bold text-slate-450 uppercase">Volatilitas ($\sigma$)</span>
+                  <span className="block text-3xs font-bold text-slate-400 uppercase">Volatilitas ($\sigma$)</span>
                   <span className="text-sm font-extrabold text-indigo-600 font-mono">{result.parameters.volatilitasHarianPersen}</span>
                 </div>
               </div>
-              <p className="text-3xs text-slate-450 leading-normal font-medium">
+              <p className="text-3xs text-slate-400 leading-normal font-medium">
                 *Drift harian mengindikasikan arah tren jangka panjang, volatilitas mengukur deviasi standar dari return harian historis (ukuran risiko).
               </p>
             </div>
@@ -357,7 +357,7 @@ export default function PrediksiPage() {
                 </div>
                 <div className="border-r border-slate-200 pr-2 sm:px-2">
                   <span className="block text-3xs font-bold text-slate-500 uppercase">Confidence Interval 95%</span>
-                  <span className="text-xs font-bold text-emerald-650 font-mono block mt-1">
+                  <span className="text-xs font-bold text-emerald-600 font-mono block mt-1">
                     {result.confidenceInterval95.batasBawah} - {result.confidenceInterval95.batasAtas}
                   </span>
                 </div>
@@ -368,7 +368,7 @@ export default function PrediksiPage() {
               </div>
 
               {/* Box Info Hasil Prediksi */}
-              <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl text-sm leading-relaxed text-indigo-750 font-medium">
+              <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl text-sm leading-relaxed text-indigo-700 font-medium">
                 Berdasarkan <strong>{result.totalSampleHistoris}</strong> data historis aktual saham <strong>{result.kodeSaham}</strong>, model Geometric Brownian Motion memproyeksikan harga penutupan pada tanggal <strong>{result.tanggalPrediksi}</strong> akan ditutup di sekitar <strong>Rp {result.hargaPrediksi.toLocaleString('id-ID')}</strong> dengan tingkat kepercayaan 95% berada dalam rentang Rp {result.confidenceInterval95.batasBawah.toLocaleString('id-ID')} hingga Rp {result.confidenceInterval95.batasAtas.toLocaleString('id-ID')}.
               </div>
 
@@ -384,7 +384,7 @@ export default function PrediksiPage() {
               </div>
               <div>
                 <h4 className="text-sm font-bold text-slate-800">Belum Ada Simulasi Terpilih</h4>
-                <p className="text-xs text-slate-550 mt-1 max-w-sm font-medium">Silakan pilih emiten saham di sebelah kiri dan klik tombol "Jalankan Simulasi" untuk menampilkan proyeksi Monte Carlo.</p>
+                <p className="text-xs text-slate-500 mt-1 max-w-sm font-medium">Silakan pilih emiten saham di sebelah kiri dan klik tombol "Jalankan Simulasi" untuk menampilkan proyeksi Monte Carlo.</p>
               </div>
             </div>
           )}

@@ -273,7 +273,7 @@ export default function SahamPage() {
                 placeholder="Contoh: ACES, BBRI"
                 value={newKode}
                 onChange={e => setNewKode(e.target.value)}
-                className="w-full rounded-xl border border-slate-350 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
             <div>
@@ -284,7 +284,7 @@ export default function SahamPage() {
                 placeholder="Contoh: Ace Hardware Indonesia"
                 value={newNama}
                 onChange={e => setNewNama(e.target.value)}
-                className="w-full rounded-xl border border-slate-350 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
             <div>
@@ -294,7 +294,7 @@ export default function SahamPage() {
                 placeholder="Contoh: Consumer Cyclical"
                 value={newSektor}
                 onChange={e => setNewSektor(e.target.value)}
-                className="w-full rounded-xl border border-slate-350 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
             <div className="flex gap-2">
@@ -313,8 +313,8 @@ export default function SahamPage() {
               </button>
             </div>
           </form>
-          {formError && <p className="mt-3 text-sm text-red-650 font-medium">{formError}</p>}
-          {formSuccess && <p className="mt-3 text-sm text-emerald-650 font-medium">{formSuccess}</p>}
+          {formError && <p className="mt-3 text-sm text-red-600 font-medium">{formError}</p>}
+          {formSuccess && <p className="mt-3 text-sm text-emerald-600 font-medium">{formSuccess}</p>}
         </div>
       )}
 
@@ -329,7 +329,7 @@ export default function SahamPage() {
             placeholder="Cari kode saham, nama emiten, atau sektor..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-slate-350 bg-white pl-10 pr-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
         </div>
         <div className="text-xs text-slate-500 font-bold flex items-center gap-1.5">
@@ -376,7 +376,7 @@ export default function SahamPage() {
                       <button
                         onClick={() => handleViewHistory(stock)}
                         disabled={stock.dataCount === 0}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-slate-250 hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 disabled:opacity-40 transition shadow-sm"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 disabled:opacity-40 transition shadow-sm"
                       >
                         <History size={13} /> Histori
                       </button>
@@ -386,7 +386,7 @@ export default function SahamPage() {
                           <button
                             onClick={() => handleSyncData(stock.kode_saham)}
                             disabled={syncingKode === stock.kode_saham}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 hover:text-white px-3 py-1.5 text-xs font-bold text-indigo-750 disabled:opacity-50 transition shadow-sm"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 hover:text-white px-3 py-1.5 text-xs font-bold text-indigo-700 disabled:opacity-50 transition shadow-sm"
                           >
                             <RefreshCw size={13} className={syncingKode === stock.kode_saham ? 'animate-spin' : ''} />
                             Sync

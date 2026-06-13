@@ -37,7 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-650 border-t-transparent"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -73,14 +73,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             <span className="text-lg font-bold text-slate-900 tracking-wide">Monte Carlo</span>
           </Link>
-          <button className="lg:hidden text-slate-550 hover:text-slate-950" onClick={() => setSidebarOpen(false)}>
+          <button className="lg:hidden text-slate-500 hover:text-slate-950" onClick={() => setSidebarOpen(false)}>
             <X size={20} />
           </button>
         </div>
 
         {/* User Profile Info Card */}
         <div className="p-4 mx-4 my-6 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-650 border border-slate-200 shadow-sm">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-600 border border-slate-200 shadow-sm">
             {role === 'admin' ? <ShieldCheck size={20} className="text-indigo-600" /> : <UserIcon size={20} />}
           </div>
           <div className="min-w-0 flex-1">
@@ -125,7 +125,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-4 border-t border-slate-200">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-650 hover:bg-red-50 hover:text-red-700 transition duration-150"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition duration-150"
           >
             <LogOut size={18} />
             Keluar (Logout)

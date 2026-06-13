@@ -142,13 +142,13 @@ export default function ValidasiPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-extrabold text-slate-900 font-sans">Pengujian Validasi Model</h2>
-          <p className="text-sm text-slate-550 font-medium">Analisis keandalan prediksi Monte Carlo menggunakan metrik galat MAPE & RMSE</p>
+          <p className="text-sm text-slate-500 font-medium">Analisis keandalan prediksi Monte Carlo menggunakan metrik galat MAPE & RMSE</p>
         </div>
         {role === 'admin' && (
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowManualModal(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-250 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition duration-150 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition duration-150 shadow-sm"
             >
               Update Aktual Manual
             </button>
@@ -165,7 +165,7 @@ export default function ValidasiPage() {
       </div>
 
       {/* Rangkuman Singkat Indikator Evaluasi */}
-      <div className="bg-white border border-slate-205 p-4 rounded-2xl flex items-start gap-3 text-xs text-slate-500 leading-relaxed max-w-3xl shadow-sm font-medium">
+      <div className="bg-white border border-slate-200 p-4 rounded-2xl flex items-start gap-3 text-xs text-slate-500 leading-relaxed max-w-3xl shadow-sm font-medium">
         <Info size={16} className="text-indigo-600 shrink-0 mt-0.5" />
         <div>
           <span className="font-bold text-slate-800 block mb-0.5">Penjelasan Pengujian Validasi:</span>
@@ -230,7 +230,7 @@ export default function ValidasiPage() {
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${
                           item.evaluasiAkurasi.mapeStatus === 'Sangat Akurat' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
                           item.evaluasiAkurasi.mapeStatus === 'Baik' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
-                          item.evaluasiAkurasi.mapeStatus === 'Layak' ? 'bg-yellow-50 text-yellow-755 border border-yellow-100' :
+                          item.evaluasiAkurasi.mapeStatus === 'Layak' ? 'bg-yellow-50 text-yellow-700 border border-yellow-100' :
                           'bg-red-50 text-red-700 border border-red-100'
                         }`}>
                           {item.evaluasiAkurasi.mapeStatus}
@@ -259,7 +259,7 @@ export default function ValidasiPage() {
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
               <div className="flex items-center gap-2">
-                <CheckSquare size={16} className="text-indigo-650" />
+                <CheckSquare size={16} className="text-indigo-600" />
                 <h3 className="text-base font-bold text-slate-950">Update Harga Aktual</h3>
               </div>
               <button 
@@ -275,12 +275,12 @@ export default function ValidasiPage() {
 
             <form onSubmit={handleManualSubmit} className="p-6 space-y-4">
               {manualStatus.error && (
-                <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-650 font-medium">
+                <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-600 font-medium">
                   {manualStatus.error}
                 </div>
               )}
               {manualStatus.success && (
-                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-650 font-medium">
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-600 font-medium">
                   {manualStatus.success}
                 </div>
               )}
@@ -291,7 +291,7 @@ export default function ValidasiPage() {
                   required
                   value={selectedStock}
                   onChange={e => setSelectedStock(e.target.value)}
-                  className="w-full rounded-xl border border-slate-350 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 >
                   <option value="" disabled>Pilih Kode Saham</option>
                   {stocks.map(s => (
@@ -307,7 +307,7 @@ export default function ValidasiPage() {
                   required
                   value={manualDate}
                   onChange={e => setManualDate(e.target.value)}
-                  className="w-full rounded-xl border border-slate-350 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -319,7 +319,7 @@ export default function ValidasiPage() {
                   placeholder="Masukkan nominal"
                   value={manualPrice}
                   onChange={e => setManualPrice(e.target.value)}
-                  className="w-full rounded-xl border border-slate-350 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 

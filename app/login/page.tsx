@@ -50,7 +50,7 @@ export default function LoginPage() {
   if (authLoading || user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-650 border-t-transparent"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -58,14 +58,14 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
       {/* Background soft gradients */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-80 h-80 bg-purple-200/40 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-100 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-80 h-80 bg-purple-100 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
-        <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-slate-900">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center">
+        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Monte Carlo Predictor
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-550">
+        <p className="mt-2 text-sm text-slate-500 font-medium">
           Sistem Prediksi & Validasi Harga Saham Harian
         </p>
       </div>
@@ -129,9 +129,9 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-slate-550">
+            <p className="text-sm text-slate-600">
               Belum punya akun?{' '}
-              <Link href="/register" className="font-semibold text-indigo-650 hover:text-indigo-550">
+              <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
                 Daftar sekarang
               </Link>
             </p>

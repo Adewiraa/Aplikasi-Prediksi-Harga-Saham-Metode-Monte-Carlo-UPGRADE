@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Ambil role dari user_metadata (default ke 'user' jika tidak ada)
-        setRole(session.user.user_metadata?.role || 'user');
+        // Ambil role dari user_metadata (default ke 'admin' jika tidak ada)
+        setRole(session.user.user_metadata?.role || 'admin');
       }
       setLoading(false);
     });
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          setRole(session.user.user_metadata?.role || 'user');
+          setRole(session.user.user_metadata?.role || 'admin');
         } else {
           setRole(null);
         }
