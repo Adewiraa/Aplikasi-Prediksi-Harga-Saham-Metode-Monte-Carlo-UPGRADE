@@ -36,8 +36,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-650 border-t-transparent"></div>
       </div>
     );
   }
@@ -50,48 +50,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex h-screen bg-zinc-950 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-800">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-zinc-950/80 backdrop-blur-sm lg:hidden" 
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden" 
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar Container */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-zinc-800 bg-zinc-900/90 backdrop-blur-md transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-zinc-800">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200 bg-white">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30">
               MC
             </div>
-            <span className="text-lg font-bold text-white tracking-wide">Monte Carlo</span>
+            <span className="text-lg font-bold text-slate-900 tracking-wide">Monte Carlo</span>
           </Link>
-          <button className="lg:hidden text-zinc-400 hover:text-white" onClick={() => setSidebarOpen(false)}>
+          <button className="lg:hidden text-slate-550 hover:text-slate-950" onClick={() => setSidebarOpen(false)}>
             <X size={20} />
           </button>
         </div>
 
         {/* User Profile Info Card */}
-        <div className="p-4 mx-4 my-6 rounded-2xl bg-zinc-950/50 border border-zinc-800/80 flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700">
-            {role === 'admin' ? <ShieldCheck size={20} className="text-indigo-400" /> : <UserIcon size={20} />}
+        <div className="p-4 mx-4 my-6 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-650 border border-slate-200 shadow-sm">
+            {role === 'admin' ? <ShieldCheck size={20} className="text-indigo-600" /> : <UserIcon size={20} />}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white">
+            <p className="truncate text-sm font-bold text-slate-900">
               {user.user_metadata?.full_name || user.email?.split('@')[0]}
             </p>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-2xs font-medium border ${
+              <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-2xs font-bold border ${
                 role === 'admin' 
-                  ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' 
-                  : 'bg-zinc-500/10 text-zinc-400 border-zinc-700'
+                  ? 'bg-indigo-50 text-indigo-700 border-indigo-100' 
+                  : 'bg-slate-100 text-slate-600 border-slate-200'
               }`}>
                 {role?.toUpperCase()}
               </span>
@@ -108,10 +108,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition duration-150 ${
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition duration-150 ${
                   isActive 
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
-                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-white'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 <Icon size={18} />
@@ -122,10 +122,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Bottom Menu / Logout */}
-        <div className="p-4 border-t border-zinc-800">
+        <div className="p-4 border-t border-slate-200">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition duration-150"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-650 hover:bg-red-50 hover:text-red-700 transition duration-150"
           >
             <LogOut size={18} />
             Keluar (Logout)
@@ -136,27 +136,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Navbar */}
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900/40 backdrop-blur-md px-6">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/70 backdrop-blur-md px-6">
           <div className="flex items-center gap-4">
             <button
-              className="lg:hidden text-zinc-400 hover:text-white"
+              className="lg:hidden text-slate-600 hover:text-slate-900"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu size={24} />
             </button>
-            <h1 className="text-lg font-bold text-white capitalize">
+            <h1 className="text-lg font-extrabold text-slate-900 capitalize">
               {pathname.split('/').pop() || 'Dashboard'}
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-500 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1 font-mono">
+            <span className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-3 py-1 font-mono font-semibold">
               Serverless Node API
             </span>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto bg-zinc-950 p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
           {children}
         </main>
       </div>
