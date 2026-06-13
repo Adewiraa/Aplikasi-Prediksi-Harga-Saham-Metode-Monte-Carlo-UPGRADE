@@ -136,11 +136,8 @@ export default function LoginPage() {
           </form>
 
           <div className="text-center">
-            <p className="text-sm text-slate-600">
-              Belum punya akun?{' '}
-              <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                Daftar sekarang
-              </Link>
+            <p className="text-xs text-slate-400 font-medium">
+              Monte Carlo Stock Predictor Upgrade © 2026
             </p>
           </div>
         </div>

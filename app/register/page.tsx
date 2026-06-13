@@ -17,10 +17,14 @@ export default function RegisterPage() {
   const router = useRouter();
   const { user, loading: authLoading, signIn } = useAuth();
 
-  // Redirect jika sudah login
+  // Registrasi dinonaktifkan untuk publik. Redirect ke login/dashboard.
   useEffect(() => {
-    if (!authLoading && user) {
-      router.replace('/dashboard');
+    if (!authLoading) {
+      if (user) {
+        router.replace('/dashboard');
+      } else {
+        router.replace('/login');
+      }
     }
   }, [user, authLoading, router]);
 

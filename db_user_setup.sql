@@ -26,3 +26,12 @@ CREATE POLICY "Allow public delete" ON public.users FOR DELETE USING (true);
 
 -- 5. Berikan hak akses penuh ke client role
 GRANT ALL ON TABLE public.users TO anon, authenticated, service_role;
+
+-- 6. Sisipkan akun bawaan untuk demonstrasi dan keamanan
+INSERT INTO public.users (nama, username, password, level)
+VALUES ('Ade Wiramiharja (Admin)', 'admin@prediksihargasaham.com', 'admin1234', 'Admin')
+ON CONFLICT (username) DO NOTHING;
+
+INSERT INTO public.users (nama, username, password, level)
+VALUES ('Demo Visitor', 'demo@prediksihargasaham.com', 'demo1234', 'User')
+ON CONFLICT (username) DO NOTHING;
