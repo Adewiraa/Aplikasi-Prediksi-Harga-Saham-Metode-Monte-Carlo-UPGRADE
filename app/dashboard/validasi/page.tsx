@@ -24,6 +24,27 @@ export default function ValidasiPage() {
   const [loading, setLoading] = useState(true);
   const [syncingActuals, setSyncingActuals] = useState(false);
 
+  // Custom Alert Modal State
+  const [modalConfig, setModalConfig] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  }>({
+    show: false,
+    title: '',
+    message: '',
+  });
+
+  const showAlert = (title: string, message: string) => {
+    setModalConfig({
+      show: true,
+      title,
+      message,
+      onConfirm: () => setModalConfig(prev => ({ ...prev, show: false }))
+    });
+  };
+
   // States untuk modal input manual
   const [showManualModal, setShowManualModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState('');
@@ -69,13 +90,13 @@ export default function ValidasiPage() {
       const res = await fetch('/api/saham/sync-actual');
       const resJson = await res.json();
       if (resJson.success) {
-        alert(resJson.message);
+        showAlert('Sinkronisasi Sukses', resJson.message);
         loadValidationData();
       } else {
-        alert(`Gagal: ${resJson.message}`);
+        showAlert('Gagal Sinkronisasi', resJson.message);
       }
     } catch (err) {
-      alert('Terjadi kesalahan koneksi saat menyinkronkan data.');
+      showAlert('Koneksi Gagal', 'Terjadi kesalahan koneksi saat menyinkronkan data.');
     } finally {
       setSyncingActuals(false);
     }
@@ -148,14 +169,14 @@ export default function ValidasiPage() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowManualModal(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition duration-150 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition duration-150 shadow-sm cursor-pointer"
             >
               Update Aktual Manual
             </button>
             <button
               onClick={handleSyncActuals}
               disabled={syncingActuals}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 disabled:opacity-50 transition duration-150"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 disabled:opacity-50 transition duration-150 cursor-pointer"
             >
               <RefreshCw size={15} className={syncingActuals ? 'animate-spin' : ''} />
               Sync Harga Aktual Otomatis
@@ -255,8 +276,8 @@ export default function ValidasiPage() {
 
       {/* Modal Input Manual (Admin Only) */}
       {showManualModal && role === 'admin' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-zoom-in">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
               <div className="flex items-center gap-2">
                 <CheckSquare size={16} className="text-indigo-600" />
@@ -267,7 +288,7 @@ export default function ValidasiPage() {
                   setShowManualModal(false);
                   setManualStatus({ error: '', success: '' });
                 }}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-slate-700 cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -327,14 +348,14 @@ export default function ValidasiPage() {
                 <button
                   type="submit"
                   disabled={submittingManual}
-                  className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition shadow-sm"
+                  className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white hover:bg-indigo-500 disabled:opacity-50 transition shadow-sm cursor-pointer"
                 >
                   {submittingManual ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowManualModal(false)}
-                  className="rounded-xl bg-slate-100 border border-slate-200 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200"
+                  className="rounded-xl bg-slate-100 border border-slate-200 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 cursor-pointer"
                 >
                   Batal
                 </button>
@@ -343,6 +364,43 @@ export default function ValidasiPage() {
           </div>
         </div>
       )}
+
+      {/* Custom Alert Modal */}
+      {modalConfig.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 animate-zoom-in">
+            <h3 className="text-lg font-extrabold text-slate-900 mb-2">{modalConfig.title}</h3>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">{modalConfig.message}</p>
+            
+            <div className="flex justify-end">
+              <button
+                onClick={modalConfig.onConfirm}
+                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150 cursor-pointer"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Embedded CSS Animations for Premium Modal Entry */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeIn {
+          from { opacity: 0; backdrop-filter: blur(0px); }
+          to { opacity: 1; backdrop-filter: blur(4px); }
+        }
+        @keyframes zoomIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.2s ease-out forwards;
+        }
+        .animate-zoom-in {
+          animation: zoomIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+      `}} />
     </div>
   );
 }
