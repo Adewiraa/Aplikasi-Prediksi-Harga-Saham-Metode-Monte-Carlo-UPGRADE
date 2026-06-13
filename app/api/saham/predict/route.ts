@@ -104,6 +104,9 @@ export async function GET(request: NextRequest) {
     }
 
     // 6. Analisis Statistik Hasil Simulasi
+    // Ambil sampel simulasi acak untuk visualisasi sebelum di-sort agar sebarannya normal (atas dan bawah)
+    const samplePrices = simulatedPrices.slice(0, 100).map(p => Math.round(p));
+
     simulatedPrices.sort((a, b) => a - b);
     
     // Rata-rata (mean) hasil simulasi
@@ -157,7 +160,7 @@ export async function GET(request: NextRequest) {
           batasAtas: Math.round(upperBound),
         },
         // Kembalikan sampel 100 simulasi pertama untuk plotting visual jika diperlukan di frontend
-        simulasiSampel: simulatedPrices.slice(0, 100).map(p => Math.round(p)),
+        simulasiSampel: samplePrices,
       }
     });
 

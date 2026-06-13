@@ -53,6 +53,27 @@ export default function PrediksiPage() {
   const [result, setResult] = useState<any | null>(null);
   const [historyPrices, setHistoryPrices] = useState<any[]>([]);
 
+  // Custom Alert Modal State
+  const [modalConfig, setModalConfig] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  }>({
+    show: false,
+    title: '',
+    message: '',
+  });
+
+  const showAlert = (title: string, message: string) => {
+    setModalConfig({
+      show: true,
+      title,
+      message,
+      onConfirm: () => setModalConfig(prev => ({ ...prev, show: false }))
+    });
+  };
+
   useEffect(() => {
     loadStocks();
   }, []);
@@ -78,7 +99,7 @@ export default function PrediksiPage() {
   const handleSimulate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedKode) {
-      alert('Pilih emiten saham terlebih dahulu.');
+      showAlert('Peringatan', 'Pilih emiten saham terlebih dahulu.');
       return;
     }
 
@@ -91,7 +112,7 @@ export default function PrediksiPage() {
       const resJson = await res.json();
 
       if (!resJson.success) {
-        alert(resJson.message);
+        showAlert('Error', resJson.message);
         setLoading(false);
         return;
       }
@@ -108,7 +129,7 @@ export default function PrediksiPage() {
 
       setResult(resJson.data);
     } catch (err) {
-      alert('Terjadi kesalahan koneksi saat menjalankan simulasi.');
+      showAlert('Error', 'Terjadi kesalahan koneksi saat menjalankan simulasi.');
     } finally {
       setLoading(false);
     }
@@ -219,7 +240,7 @@ export default function PrediksiPage() {
         labels: {
           color: '#475569',
           filter: (legendItem: any) => {
-            return ['Harga Aktual Historis', 'Rata-rata Prediksi Monte Carlo'].includes(legendItem.text);
+            return ['Harga Aktual Historis', 'Rata-rata Prediksi Monte Carlo', 'Batas Atas (97.5%)', 'Batas Bawah (2.5%)'].includes(legendItem.text);
           }
         }
       },
@@ -317,7 +338,7 @@ export default function PrediksiPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-indigo-500 disabled:opacity-50 transition duration-150"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-md hover:bg-indigo-500 disabled:opacity-50 transition duration-150 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -407,6 +428,43 @@ export default function PrediksiPage() {
           )}
         </div>
       </div>
+
+      {/* Custom Alert Modal */}
+      {modalConfig.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 animate-zoom-in">
+            <h3 className="text-lg font-extrabold text-slate-900 mb-2">{modalConfig.title}</h3>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">{modalConfig.message}</p>
+            
+            <div className="flex justify-end">
+              <button
+                onClick={modalConfig.onConfirm}
+                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150 cursor-pointer"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Embedded CSS Animations for Premium Modal Entry */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeIn {
+          from { opacity: 0; backdrop-filter: blur(0px); }
+          to { opacity: 1; backdrop-filter: blur(4px); }
+        }
+        @keyframes zoomIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.2s ease-out forwards;
+        }
+        .animate-zoom-in {
+          animation: zoomIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+      `}} />
     </div>
   );
 }
