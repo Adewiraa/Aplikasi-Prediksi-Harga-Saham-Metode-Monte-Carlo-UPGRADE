@@ -56,6 +56,52 @@ export default function SahamPage() {
   const [syncProgress, setSyncProgress] = useState<string | null>(null);
   const [dbError, setDbError] = useState<string | null>(null);
 
+  // Custom Alert / Confirm Modal State
+  const [modalConfig, setModalConfig] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    type: 'alert' | 'confirm';
+    onConfirm?: () => void;
+    onCancel?: () => void;
+  }>({
+    show: false,
+    title: '',
+    message: '',
+    type: 'alert'
+  });
+
+  // Helper functions to show custom popups
+  const showAlert = (title: string, message: string, onConfirm?: () => void) => {
+    setModalConfig({
+      show: true,
+      title,
+      message,
+      type: 'alert',
+      onConfirm: () => {
+        setModalConfig(prev => ({ ...prev, show: false }));
+        if (onConfirm) onConfirm();
+      }
+    });
+  };
+
+  const showConfirm = (title: string, message: string, onConfirm: () => void, onCancel?: () => void) => {
+    setModalConfig({
+      show: true,
+      title,
+      message,
+      type: 'confirm',
+      onConfirm: () => {
+        setModalConfig(prev => ({ ...prev, show: false }));
+        onConfirm();
+      },
+      onCancel: () => {
+        setModalConfig(prev => ({ ...prev, show: false }));
+        if (onCancel) onCancel();
+      }
+    });
+  };
+
   // States untuk detail riwayat (modal)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState<any | null>(null);
@@ -92,39 +138,41 @@ export default function SahamPage() {
     }
   }
 
-  const handleSyncAll = async () => {
+  const handleSyncAll = () => {
     if (stocks.length === 0) {
-      alert('Tidak ada emiten saham untuk disinkronkan.');
+      showAlert('Peringatan', 'Tidak ada emiten saham untuk disinkronkan.');
       return;
     }
     
-    if (!confirm(`Apakah Anda ingin mensinkronkan data historis Yahoo Finance untuk seluruh ${stocks.length} emiten? Proses ini membutuhkan waktu beberapa menit.`)) {
-      return;
-    }
-
-    setSyncProgress('Memulai...');
-    try {
-      for (let i = 0; i < stocks.length; i++) {
-        const stock = stocks[i];
-        setSyncProgress(`${stock.kode_saham} (${i + 1}/${stocks.length})`);
-        
+    showConfirm(
+      'Sinkronisasi Semua Emiten',
+      `Apakah Anda ingin mensinkronkan data historis Yahoo Finance untuk seluruh ${stocks.length} emiten? Proses ini membutuhkan waktu beberapa menit.`,
+      async () => {
+        setSyncProgress('Memulai...');
         try {
-          const res = await fetch(`/api/saham/sync?kodeSaham=${stock.kode_saham}&range=1y`);
-          const resJson = await res.json();
-          if (!resJson.success) {
-            console.error(`Gagal sync ${stock.kode_saham}: ${resJson.message}`);
+          for (let i = 0; i < stocks.length; i++) {
+            const stock = stocks[i];
+            setSyncProgress(`${stock.kode_saham} (${i + 1}/${stocks.length})`);
+            
+            try {
+              const res = await fetch(`/api/saham/sync?kodeSaham=${stock.kode_saham}&range=1y`);
+              const resJson = await res.json();
+              if (!resJson.success) {
+                console.error(`Gagal sync ${stock.kode_saham}: ${resJson.message}`);
+              }
+            } catch (e) {
+              console.error(`Koneksi error sync ${stock.kode_saham}`, e);
+            }
           }
-        } catch (e) {
-          console.error(`Koneksi error sync ${stock.kode_saham}`, e);
+          showAlert('Sukses', 'Berhasil mensinkronkan seluruh emiten saham!');
+          loadStocks();
+        } catch (err: any) {
+          showAlert('Error', `Gagal menjalankan sinkronisasi: ${err.message}`);
+        } finally {
+          setSyncProgress(null);
         }
       }
-      alert('Berhasil mensinkronkan seluruh emiten saham!');
-      loadStocks();
-    } catch (err: any) {
-      alert(`Gagal menjalankan sinkronisasi: ${err.message}`);
-    } finally {
-      setSyncProgress(null);
-    }
+    );
   };
 
   const handleAddStock = async (e: React.FormEvent) => {
@@ -165,22 +213,24 @@ export default function SahamPage() {
     }
   };
 
-  const handleDeleteStock = async (kode: string) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus saham ${kode} beserta semua data historis dan prediksi terkait?`)) {
-      return;
-    }
+  const handleDeleteStock = (kode: string) => {
+    showConfirm(
+      'Hapus Emiten Saham',
+      `Apakah Anda yakin ingin menghapus saham ${kode} beserta semua data historis dan prediksi terkait?`,
+      async () => {
+        try {
+          const { error } = await supabase
+            .from('saham')
+            .delete()
+            .eq('kode_saham', kode);
 
-    try {
-      const { error } = await supabase
-        .from('saham')
-        .delete()
-        .eq('kode_saham', kode);
-
-      if (error) throw error;
-      loadStocks();
-    } catch (err: any) {
-      alert(`Gagal menghapus saham: ${err.message}`);
-    }
+          if (error) throw error;
+          loadStocks();
+        } catch (err: any) {
+          showAlert('Error', `Gagal menghapus saham: ${err.message}`);
+        }
+      }
+    );
   };
 
 
@@ -190,13 +240,13 @@ export default function SahamPage() {
       const res = await fetch(`/api/saham/sync?kodeSaham=${kode}&range=1y`);
       const data = await res.json();
       if (data.success) {
-        alert(`Berhasil sinkronisasi! Ditambahkan ${data.count} baris data historis.`);
+        showAlert('Sukses', `Berhasil sinkronisasi! Data historis untuk ${kode} telah diperbarui.`);
         loadStocks();
       } else {
-        alert(`Sinkronisasi gagal: ${data.message}`);
+        showAlert('Gagal', `Sinkronisasi gagal: ${data.message}`);
       }
     } catch (err) {
-      alert('Terjadi kesalahan koneksi saat sinkronisasi.');
+      showAlert('Error', 'Terjadi kesalahan koneksi saat sinkronisasi.');
     } finally {
       setSyncingKode(null);
     }
@@ -296,7 +346,7 @@ export default function SahamPage() {
             <button
               onClick={handleSyncAll}
               disabled={syncProgress !== null}
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-emerald-500 hover:shadow-emerald-500/10 transition duration-150"
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-emerald-500 hover:shadow-emerald-500/10 transition duration-150 cursor-pointer"
             >
               {syncProgress ? (
                 <>
@@ -312,7 +362,7 @@ export default function SahamPage() {
             </button>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150 cursor-pointer"
             >
               <Plus size={16} /> Tambah Emiten
             </button>
@@ -373,14 +423,14 @@ export default function SahamPage() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500 transition duration-150 shadow-sm"
+                className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500 transition duration-150 shadow-sm cursor-pointer"
               >
                 Simpan
               </button>
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="rounded-xl bg-slate-100 border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200"
+                className="rounded-xl bg-slate-100 border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 cursor-pointer"
               >
                 Batal
               </button>
@@ -445,11 +495,10 @@ export default function SahamPage() {
                         {stock.dataCount} Hari Kerja
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
+                    <td className="px-6 py-4 flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleViewHistory(stock)}
-                        disabled={stock.dataCount === 0}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 disabled:opacity-40 transition shadow-sm"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition shadow-sm cursor-pointer"
                       >
                         <History size={13} /> Histori
                       </button>
@@ -459,14 +508,14 @@ export default function SahamPage() {
                           <button
                             onClick={() => handleSyncData(stock.kode_saham)}
                             disabled={syncingKode === stock.kode_saham}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 hover:text-white px-3 py-1.5 text-xs font-bold text-indigo-700 disabled:opacity-50 transition shadow-sm"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 hover:text-white px-3 py-1.5 text-xs font-bold text-indigo-700 disabled:opacity-50 transition shadow-sm cursor-pointer"
                           >
                             <RefreshCw size={13} className={syncingKode === stock.kode_saham ? 'animate-spin' : ''} />
                             Sync
                           </button>
                           <button
                             onClick={() => handleDeleteStock(stock.kode_saham)}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-100 hover:bg-red-600 hover:text-white px-3 py-1.5 text-xs font-bold text-red-750 transition shadow-sm"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 border border-red-100 hover:bg-red-600 hover:text-white px-3 py-1.5 text-xs font-bold text-red-750 transition shadow-sm cursor-pointer"
                           >
                             <Trash2 size={13} /> Hapus
                           </button>
@@ -532,6 +581,33 @@ export default function SahamPage() {
               ) : (
                 <p className="text-center text-sm text-slate-400 font-medium py-12">Tidak ada data historis yang tersedia.</p>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Alert/Confirm Modal */}
+      {modalConfig.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200">
+          <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-2xl transition-all border border-slate-100 scale-100">
+            <h3 className="text-lg font-extrabold text-slate-900 mb-2">{modalConfig.title}</h3>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">{modalConfig.message}</p>
+            
+            <div className="flex justify-end gap-3">
+              {modalConfig.type === 'confirm' && (
+                <button
+                  onClick={modalConfig.onCancel}
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition duration-150 cursor-pointer"
+                >
+                  Batal
+                </button>
+              )}
+              <button
+                onClick={modalConfig.onConfirm}
+                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150 cursor-pointer"
+              >
+                {modalConfig.type === 'confirm' ? 'Ya, Lanjutkan' : 'Mengerti'}
+              </button>
             </div>
           </div>
         </div>
