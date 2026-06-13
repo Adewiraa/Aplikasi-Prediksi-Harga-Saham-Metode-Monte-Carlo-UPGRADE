@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signInDemo } = useAuth();
 
   // Redirect jika sudah login
   useEffect(() => {
@@ -25,6 +25,14 @@ export default function LoginPage() {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
+
+    // Bypassing jika menggunakan akun demo khusus
+    if (email.trim() === 'admin@skripsi.com' && password === 'admin') {
+      signInDemo('admin@skripsi.com', 'Ade Wiramiharja (Demo)', 'admin');
+      router.push('/dashboard');
+      setLoading(false);
+      return;
+    }
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -45,6 +53,11 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBypassDemo = () => {
+    signInDemo('admin@skripsi.com', 'Ade Wiramiharja (Demo)', 'admin');
+    router.push('/dashboard');
   };
 
   if (authLoading || user) {
@@ -71,10 +84,10 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 px-4">
-        <div className="bg-white border border-slate-200 py-8 px-6 shadow-xl rounded-2xl sm:px-10">
+        <div className="bg-white border border-slate-200 py-8 px-6 shadow-xl rounded-2xl sm:px-10 space-y-6">
           <form className="space-y-6" onSubmit={handleLogin}>
             {errorMsg && (
-              <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-600">
+              <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-600 font-medium">
                 {errorMsg}
               </div>
             )}
@@ -117,7 +130,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div>
+            <div className="space-y-3">
               <button
                 type="submit"
                 disabled={loading}
@@ -125,13 +138,25 @@ export default function LoginPage() {
               >
                 {loading ? 'Sedang Masuk...' : 'Masuk'}
               </button>
+
+              <button
+                type="button"
+                onClick={handleBypassDemo}
+                className="flex w-full justify-center rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-700 hover:bg-indigo-100 transition duration-150"
+              >
+                Masuk Instan (Bypass Demo)
+              </button>
             </div>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="text-center text-xs text-slate-400 font-semibold border-t border-slate-100 pt-4">
+            *Bypass Demo dapat digunakan jika pendaftaran Supabase terblokir rate limit. Anda otomatis masuk sebagai Admin.
+          </div>
+
+          <div className="text-center">
             <p className="text-sm text-slate-600">
               Belum punya akun?{' '}
-              <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+              <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-550">
                 Daftar sekarang
               </Link>
             </p>
