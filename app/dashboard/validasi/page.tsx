@@ -198,7 +198,7 @@ export default function ValidasiPage() {
       </div>
 
       {/* Tabel Validasi Utama */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-visible">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100">
             <thead>

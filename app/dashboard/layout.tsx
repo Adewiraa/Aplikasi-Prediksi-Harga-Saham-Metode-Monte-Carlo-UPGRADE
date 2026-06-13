@@ -192,6 +192,140 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+
+      {/* Dark Mode CSS — injected directly to bypass Tailwind v4 layer processing */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        body.dark-theme,
+        body.dark-theme > div {
+          background-color: #0b0f19 !important;
+          color: #cbd5e1 !important;
+        }
+        body.dark-theme main {
+          background-color: #0b0f19 !important;
+        }
+        body.dark-theme header {
+          background-color: rgba(11, 15, 25, 0.85) !important;
+          border-color: #1e293b !important;
+        }
+        body.dark-theme aside {
+          background-color: #111827 !important;
+          border-color: #1e293b !important;
+        }
+        body.dark-theme aside div {
+          background-color: transparent;
+        }
+        body.dark-theme aside > div:first-child {
+          background-color: #111827 !important;
+          border-color: #1e293b !important;
+        }
+        body.dark-theme aside nav a {
+          color: #94a3b8;
+        }
+        body.dark-theme aside nav a:hover {
+          background-color: #1e293b !important;
+          color: #f8fafc !important;
+        }
+        body.dark-theme [class*="bg-white"] {
+          background-color: #111827 !important;
+        }
+        body.dark-theme [class*="bg-slate-50"] {
+          background-color: #0f172a !important;
+        }
+        body.dark-theme [class*="bg-slate-100"] {
+          background-color: #1e293b !important;
+        }
+        body.dark-theme [class*="border-slate-200"],
+        body.dark-theme [class*="border-slate-100"],
+        body.dark-theme [class*="divide-slate-100"] > * + * {
+          border-color: #1e293b !important;
+        }
+        body.dark-theme [class*="border-slate-200/80"] {
+          border-color: rgba(30, 41, 59, 0.8) !important;
+        }
+        body.dark-theme input,
+        body.dark-theme select,
+        body.dark-theme textarea {
+          background-color: #1e293b !important;
+          color: #f8fafc !important;
+          border-color: #334155 !important;
+        }
+        body.dark-theme input:focus,
+        body.dark-theme select:focus {
+          border-color: #6366f1 !important;
+        }
+        body.dark-theme [class*="text-slate-900"],
+        body.dark-theme [class*="text-slate-950"],
+        body.dark-theme [class*="text-slate-800"] {
+          color: #f8fafc !important;
+        }
+        body.dark-theme h1,
+        body.dark-theme h2,
+        body.dark-theme h3,
+        body.dark-theme h4,
+        body.dark-theme th,
+        body.dark-theme strong {
+          color: #f8fafc !important;
+        }
+        body.dark-theme [class*="text-slate-700"],
+        body.dark-theme [class*="text-slate-600"] {
+          color: #cbd5e1 !important;
+        }
+        body.dark-theme td {
+          color: #cbd5e1 !important;
+        }
+        body.dark-theme [class*="text-slate-500"],
+        body.dark-theme [class*="text-slate-400"] {
+          color: #64748b !important;
+        }
+        body.dark-theme tr:hover {
+          background-color: #1e293b !important;
+        }
+        body.dark-theme table thead tr {
+          background-color: #0f172a !important;
+        }
+        body.dark-theme table th {
+          background-color: #0f172a !important;
+          color: #94a3b8 !important;
+        }
+        body.dark-theme [class*="bg-indigo-50"] {
+          background-color: rgba(99, 102, 241, 0.1) !important;
+        }
+        body.dark-theme [class*="border-indigo-100"] {
+          border-color: rgba(99, 102, 241, 0.2) !important;
+        }
+        body.dark-theme [class*="text-indigo-600"],
+        body.dark-theme [class*="text-indigo-700"] {
+          color: #818cf8 !important;
+        }
+        body.dark-theme [class*="bg-red-50"] {
+          background-color: rgba(239, 68, 68, 0.1) !important;
+        }
+        body.dark-theme [class*="border-red-100"],
+        body.dark-theme [class*="border-red-200"] {
+          border-color: rgba(239, 68, 68, 0.2) !important;
+        }
+        body.dark-theme [class*="bg-emerald-50"] {
+          background-color: rgba(16, 185, 129, 0.1) !important;
+        }
+        body.dark-theme [class*="border-emerald-100"],
+        body.dark-theme [class*="border-emerald-200"] {
+          border-color: rgba(16, 185, 129, 0.2) !important;
+        }
+        body.dark-theme [class*="bg-yellow-50"] {
+          background-color: rgba(234, 179, 8, 0.1) !important;
+        }
+        body.dark-theme [class*="shadow-sm"],
+        body.dark-theme [class*="shadow-md"] {
+          box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+        }
+        body.dark-theme [class*="shadow-xl"],
+        body.dark-theme [class*="shadow-2xl"] {
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+        }
+        body.dark-theme canvas {
+          filter: brightness(0.95);
+        }
+      `}} />
     </div>
   );
 }
