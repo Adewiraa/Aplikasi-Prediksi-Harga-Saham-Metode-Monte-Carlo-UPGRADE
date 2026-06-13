@@ -53,7 +53,6 @@ export default function SahamPage() {
 
   // States untuk sinkronisasi data dari Yahoo Finance
   const [syncingKode, setSyncingKode] = useState<string | null>(null);
-  const [seeding, setSeeding] = useState(false);
 
   // States untuk detail riwayat (modal)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -144,73 +143,6 @@ export default function SahamPage() {
     }
   };
 
-  const handleSeedLQ45 = async () => {
-    if (!confirm('Apakah Anda ingin mempopulasikan daftar emiten saham dengan 45 emiten indeks LQ45 dari data bawaan?')) {
-      return;
-    }
-    setSeeding(true);
-    try {
-      const lq45Stocks = [
-        { kode_saham: 'ACES', nama_saham: 'Ace Hardware Indonesia Tbk', sektor: 'Barang Konsumen Non-Primer' },
-        { kode_saham: 'ADRO', nama_saham: 'Adaro Energy Indonesia Tbk', sektor: 'Energi' },
-        { kode_saham: 'AKRA', nama_saham: 'AKR Corporindo Tbk', sektor: 'Energi' },
-        { kode_saham: 'AMRT', nama_saham: 'Sumber Alfaria Trijaya Tbk', sektor: 'Barang Konsumen Primer' },
-        { kode_saham: 'ANTM', nama_saham: 'Aneka Tambang Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'ARTO', nama_saham: 'Bank Jago Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'ASII', nama_saham: 'Astra International Tbk', sektor: 'Perindustrian' },
-        { kode_saham: 'BBCA', nama_saham: 'Bank Central Asia Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'BBNI', nama_saham: 'Bank Negara Indonesia Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'BBRI', nama_saham: 'Bank Rakyat Indonesia Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'BBTN', nama_saham: 'Bank Tabungan Negara Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'BMRI', nama_saham: 'Bank Mandiri Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'BRIS', nama_saham: 'Bank Syariah Indonesia Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'BRPT', nama_saham: 'Barito Pacific Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'BUKA', nama_saham: 'Bukalapak.com Tbk', sektor: 'Teknologi' },
-        { kode_saham: 'CPIN', nama_saham: 'Charoen Pokphand Indonesia Tbk', sektor: 'Barang Konsumen Primer' },
-        { kode_saham: 'EMTK', nama_saham: 'Elang Mahkota Teknologi Tbk', sektor: 'Teknologi' },
-        { kode_saham: 'ESSA', nama_saham: 'Surya Esa Perkasa Tbk', sektor: 'Energi' },
-        { kode_saham: 'EXCL', nama_saham: 'XL Axiata Tbk', sektor: 'Infrastruktur' },
-        { kode_saham: 'GOTO', nama_saham: 'GoTo Gojek Tokopedia Tbk', sektor: 'Teknologi' },
-        { kode_saham: 'HRUM', nama_saham: 'Harum Energy Tbk', sektor: 'Energi' },
-        { kode_saham: 'ICBP', nama_saham: 'Indofood CBP Sukses Makmur Tbk', sektor: 'Barang Konsumen Primer' },
-        { kode_saham: 'INCO', nama_saham: 'Vale Indonesia Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'INDF', nama_saham: 'Indofood Sukses Makmur Tbk', sektor: 'Barang Konsumen Primer' },
-        { kode_saham: 'INDY', nama_saham: 'Indika Energy Tbk', sektor: 'Energi' },
-        { kode_saham: 'INKP', nama_saham: 'Indah Kiat Pulp & Paper Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'INTP', nama_saham: 'Indocement Tunggal Prakarsa Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'ITMG', nama_saham: 'Indo Tambangraya Megah Tbk', sektor: 'Energi' },
-        { kode_saham: 'JPFA', nama_saham: 'Japfa Comfeed Indonesia Tbk', sektor: 'Barang Konsumen Primer' },
-        { kode_saham: 'KLBF', nama_saham: 'Kalbe Farma Tbk', sektor: 'Kesehatan' },
-        { kode_saham: 'MDKA', nama_saham: 'Merdeka Copper Gold Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'MEDC', nama_saham: 'Medco Energi Internasional Tbk', sektor: 'Energi' },
-        { kode_saham: 'PGAS', nama_saham: 'Perusahaan Gas Negara Tbk', sektor: 'Energi' },
-        { kode_saham: 'PTBA', nama_saham: 'Bukit Asam Tbk', sektor: 'Energi' },
-        { kode_saham: 'SCMA', nama_saham: 'Surya Citra Media Tbk', sektor: 'Barang Konsumen Non-Primer' },
-        { kode_saham: 'SIDO', nama_saham: 'Industri Jamu Dan Farmasi Sido Muncul Tbk', sektor: 'Kesehatan' },
-        { kode_saham: 'SMGR', nama_saham: 'Semen Indonesia Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'SRTG', nama_saham: 'Saratoga Investama Sedaya Tbk', sektor: 'Keuangan' },
-        { kode_saham: 'TBIG', nama_saham: 'Tower Bersama Infrastructure Tbk', sektor: 'Infrastruktur' },
-        { kode_saham: 'TINS', nama_saham: 'Timah Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'TLKM', nama_saham: 'Telkom Indonesia Tbk', sektor: 'Infrastruktur' },
-        { kode_saham: 'TOWR', nama_saham: 'Sarana Menara Nusantara Tbk', sektor: 'Infrastruktur' },
-        { kode_saham: 'TPIA', nama_saham: 'Chandra Asri Petrochemical Tbk', sektor: 'Barang Baku' },
-        { kode_saham: 'UNTR', nama_saham: 'United Tractors Tbk', sektor: 'Perindustrian' },
-        { kode_saham: 'UNVR', nama_saham: 'Unilever Indonesia Tbk', sektor: 'Barang Konsumen Primer' }
-      ];
-
-      const { error } = await supabase
-        .from('saham')
-        .upsert(lq45Stocks, { onConflict: 'kode_saham' });
-
-      if (error) throw error;
-      alert('Berhasil mengimpor 45 emiten LQ45 ke Master Saham!');
-      loadStocks();
-    } catch (err: any) {
-      alert(`Gagal mengimpor emiten: ${err.message}`);
-    } finally {
-      setSeeding(false);
-    }
-  };
 
   const handleSyncData = async (kode: string) => {
     setSyncingKode(kode);
@@ -320,22 +252,12 @@ export default function SahamPage() {
           <p className="text-sm text-slate-500 font-medium">Kelola emiten saham dan lakukan sinkronisasi data historis dengan Yahoo Finance</p>
         </div>
         {role === 'admin' && (
-          <div className="flex flex-wrap gap-2 self-start sm:self-auto">
-            <button
-              onClick={handleSeedLQ45}
-              disabled={seeding}
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-emerald-500 hover:shadow-emerald-500/10 transition duration-150"
-            >
-              <Database size={16} className={seeding ? 'animate-spin' : ''} />
-              {seeding ? 'Mengimpor...' : 'Impor Saham LQ45'}
-            </button>
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150"
-            >
-              <Plus size={16} /> Tambah Emiten
-            </button>
-          </div>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150 self-start sm:self-auto"
+          >
+            <Plus size={16} /> Tambah Emiten
+          </button>
         )}
       </div>
 
