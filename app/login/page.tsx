@@ -27,9 +27,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Login dengan memvalidasi username dan password langsung dari tabel 'user'
+      // Login dengan memvalidasi username dan password langsung dari tabel 'users'
       const { data, error } = await supabase
-        .from('user')
+        .from('users')
         .select('*')
         .eq('username', email.trim())
         .eq('password', password)

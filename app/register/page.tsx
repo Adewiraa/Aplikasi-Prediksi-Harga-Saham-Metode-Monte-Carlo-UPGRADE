@@ -31,9 +31,9 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1. Cek apakah username/email sudah terdaftar di tabel 'user'
+      // 1. Cek apakah username/email sudah terdaftar di tabel 'users'
       const { data: existingUser, error: checkError } = await supabase
-        .from('user')
+        .from('users')
         .select('id')
         .eq('username', email.trim());
 
@@ -49,9 +49,9 @@ export default function RegisterPage() {
         return;
       }
 
-      // 2. Insert user baru ke dalam tabel 'user' kustom di Supabase
+      // 2. Insert user baru ke dalam tabel 'users' kustom di Supabase
       const { data, error } = await supabase
-        .from('user')
+        .from('users')
         .insert([
           {
             nama: name,
