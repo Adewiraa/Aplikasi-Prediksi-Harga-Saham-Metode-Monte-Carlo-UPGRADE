@@ -124,8 +124,9 @@ export async function GET() {
       );
     }
 
-    // 2. Jika master saham kosong, lakukan pengisian otomatis (auto-seed) 45 emiten LQ45
-    if (!stocks || stocks.length === 0) {
+    // 2. Jika master saham kosong atau terdapat nama berakhiran " Stock", lakukan pengisian otomatis (auto-seed) untuk memperbarui nama
+    const hasBadNames = stocks && stocks.some(s => s.nama_saham && s.nama_saham.endsWith(' Stock'));
+    if (!stocks || stocks.length === 0 || hasBadNames) {
       const { error: seedError } = await supabase
         .from('saham')
         .upsert(LQ45_STOCKS, { onConflict: 'kode_saham' });
