@@ -53,6 +53,8 @@ export default function SahamPage() {
 
   // States untuk sinkronisasi data dari Yahoo Finance
   const [syncingKode, setSyncingKode] = useState<string | null>(null);
+  const [syncProgress, setSyncProgress] = useState<string | null>(null);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   // States untuk detail riwayat (modal)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -66,26 +68,63 @@ export default function SahamPage() {
 
   async function loadStocks() {
     setLoading(true);
+    setDbError(null);
     try {
-      const { data, error } = await supabase
-        .from('saham')
-        .select('*, harga_historis(count)')
-        .order('kode_saham', { ascending: true });
-
-      if (error) throw error;
+      const res = await fetch('/api/saham/list');
+      const resJson = await res.json();
       
-      const formattedStocks = data.map((stock: any) => ({
+      if (!resJson.success) {
+        throw new Error(resJson.message || 'Gagal memuat daftar saham.');
+      }
+
+      const formattedStocks = resJson.data.map((stock: any) => ({
         ...stock,
         dataCount: stock.harga_historis?.[0]?.count || 0
       }));
 
       setStocks(formattedStocks);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading stocks:', err);
+      setDbError(err.message || 'Terjadi kesalahan saat memuat data database.');
     } finally {
       setLoading(false);
     }
   }
+
+  const handleSyncAll = async () => {
+    if (stocks.length === 0) {
+      alert('Tidak ada emiten saham untuk disinkronkan.');
+      return;
+    }
+    
+    if (!confirm(`Apakah Anda ingin mensinkronkan data historis Yahoo Finance untuk seluruh ${stocks.length} emiten? Proses ini membutuhkan waktu beberapa menit.`)) {
+      return;
+    }
+
+    setSyncProgress('Memulai...');
+    try {
+      for (let i = 0; i < stocks.length; i++) {
+        const stock = stocks[i];
+        setSyncProgress(`${stock.kode_saham} (${i + 1}/${stocks.length})`);
+        
+        try {
+          const res = await fetch(`/api/saham/sync?kodeSaham=${stock.kode_saham}&range=1y`);
+          const resJson = await res.json();
+          if (!resJson.success) {
+            console.error(`Gagal sync ${stock.kode_saham}: ${resJson.message}`);
+          }
+        } catch (e) {
+          console.error(`Koneksi error sync ${stock.kode_saham}`, e);
+        }
+      }
+      alert('Berhasil mensinkronkan seluruh emiten saham!');
+      loadStocks();
+    } catch (err: any) {
+      alert(`Gagal menjalankan sinkronisasi: ${err.message}`);
+    } finally {
+      setSyncProgress(null);
+    }
+  };
 
   const handleAddStock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,14 +291,46 @@ export default function SahamPage() {
           <p className="text-sm text-slate-500 font-medium">Kelola emiten saham dan lakukan sinkronisasi data historis dengan Yahoo Finance</p>
         </div>
         {role === 'admin' && (
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150 self-start sm:self-auto"
-          >
-            <Plus size={16} /> Tambah Emiten
-          </button>
+          <div className="flex flex-wrap gap-2 self-start sm:self-auto">
+            <button
+              onClick={handleSyncAll}
+              disabled={syncProgress !== null}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-emerald-500 hover:shadow-emerald-500/10 transition duration-150"
+            >
+              {syncProgress ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  <span>Syncing: {syncProgress}</span>
+                </>
+              ) : (
+                <>
+                  <RefreshCw size={16} />
+                  <span>Sinkronkan Semua</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-indigo-500 hover:shadow-indigo-500/10 transition duration-150"
+            >
+              <Plus size={16} /> Tambah Emiten
+            </button>
+          </div>
         )}
       </div>
+
+      {dbError && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 shadow-sm space-y-2">
+          <p className="font-bold">⚠️ Gagal terhubung ke database atau hak akses ditolak:</p>
+          <p className="font-mono bg-red-100/50 p-2 rounded-lg text-xs">{dbError}</p>
+          {dbError.toLowerCase().includes('permission') && (
+            <div className="text-xs space-y-1.5 mt-2">
+              <p className="font-semibold text-slate-700">Kemungkinan penyebab: Row Level Security (RLS) di database Supabase Anda aktif tetapi belum diijinkan untuk akses publik.</p>
+              <p className="text-slate-600">Silakan salin dan jalankan script SQL di file <strong className="font-mono">db_saham_setup.sql</strong> melalui <strong className="font-semibold">SQL Editor</strong> di Dashboard Supabase Anda untuk memberikan izin akses RLS!</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Form Tambah Saham (Admin Only) */}
       {showAddForm && role === 'admin' && (

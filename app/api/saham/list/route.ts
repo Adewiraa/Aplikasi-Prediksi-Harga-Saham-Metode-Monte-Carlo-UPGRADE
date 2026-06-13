@@ -114,7 +114,7 @@ export async function GET() {
     // 1. Ambil daftar emiten saham yang ada di database
     let { data: stocks, error } = await supabase
       .from('saham')
-      .select('kode_saham, nama_saham, sektor')
+      .select('kode_saham, nama_saham, sektor, harga_historis(count)')
       .order('kode_saham', { ascending: true });
 
     if (error) {
@@ -140,7 +140,7 @@ export async function GET() {
       // Ambil kembali data setelah diisi
       const { data: reloadedStocks, error: reloadError } = await supabase
         .from('saham')
-        .select('kode_saham, nama_saham, sektor')
+        .select('kode_saham, nama_saham, sektor, harga_historis(count)')
         .order('kode_saham', { ascending: true });
 
       if (reloadError) {

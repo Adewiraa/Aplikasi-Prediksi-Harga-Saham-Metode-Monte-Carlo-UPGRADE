@@ -46,6 +46,7 @@ export default function PrediksiPage() {
   const [stocks, setStocks] = useState<any[]>([]);
   const [selectedKode, setSelectedKode] = useState(defaultKode);
   const [simulations, setSimulations] = useState(1000);
+  const [windowSize, setWindowSize] = useState(60);
   
   // States untuk menampung hasil prediksi
   const [loading, setLoading] = useState(false);
@@ -86,7 +87,7 @@ export default function PrediksiPage() {
 
     try {
       // 1. Jalankan simulasi Monte Carlo di backend API Next.js
-      const res = await fetch(`/api/saham/predict?kodeSaham=${selectedKode}&simulations=${simulations}`);
+      const res = await fetch(`/api/saham/predict?kodeSaham=${selectedKode}&simulations=${simulations}&window=${windowSize}`);
       const resJson = await res.json();
 
       if (!resJson.success) {
@@ -295,6 +296,22 @@ export default function PrediksiPage() {
                 className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
               <span className="text-3xs text-slate-400 mt-1 block font-medium">Rekomendasi: 1.000 simulasi untuk kestabilan statistik</span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Rentang Data Historis</label>
+              <select
+                value={windowSize}
+                onChange={e => setWindowSize(parseInt(e.target.value))}
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value={30}>30 Hari Kerja (~1,5 Bulan)</option>
+                <option value={60}>60 Hari Kerja (~3 Bulan)</option>
+                <option value={90}>90 Hari Kerja (~4,5 Bulan)</option>
+                <option value={120}>120 Hari Kerja (~6 Bulan)</option>
+                <option value={250}>250 Hari Kerja (~1 Tahun)</option>
+              </select>
+              <span className="text-3xs text-slate-400 mt-1 block font-medium">Periode data historis yang digunakan untuk menghitung drift & volatilitas</span>
             </div>
 
             <button

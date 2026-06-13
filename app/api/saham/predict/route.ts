@@ -30,6 +30,8 @@ export async function GET(request: NextRequest) {
     const simulationsParam = searchParams.get('simulations');
     const simulations = simulationsParam ? parseInt(simulationsParam) : 1000;
     const tanggalPrediksiParam = searchParams.get('tanggalPrediksi');
+    const windowParam = searchParams.get('window');
+    const windowSize = windowParam ? parseInt(windowParam) : 60; // Default: 60 hari kerja terakhir
 
     if (!kodeSaham) {
       return NextResponse.json(
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 1. Ambil data harga historis dari database
-    const { data: history, error: historyError } = await supabase
+    let { data: history, error: historyError } = await supabase
       .from('harga_historis')
       .select('tanggal, harga_penutupan')
       .eq('kode_saham', kodeSaham)
@@ -60,6 +62,11 @@ export async function GET(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    // Gunakan subset data sesuai windowSize teratas (terbaru)
+    if (history.length > windowSize) {
+      history = history.slice(-windowSize);
     }
 
     const n = history.length;
@@ -85,12 +92,13 @@ export async function GET(request: NextRequest) {
     // 4. Tentukan tanggal target prediksi (esok hari kerja)
     const targetDate = tanggalPrediksiParam || getNextTradingDay(tanggalTerakhir);
 
-    // 5. Jalankan Simulasi Monte Carlo menggunakan rumus GBM
+    // 5. Jalankan Simulasi Monte Carlo menggunakan rumus GBM (Tanpa double subtraction pada drift)
     const simulatedPrices: number[] = [];
     for (let i = 0; i < simulations; i++) {
       const Z = randomNormal();
-      // Rumus GBM untuk 1 hari ke depan: S_t = S_0 * exp( (drift - 0.5 * vol^2) + vol * Z )
-      const exponent = (drift - 0.5 * Math.pow(volatility, 2)) + volatility * Z;
+      // Drift harian empiris (drift) adalah estimator dari (mu - 0.5 * sigma^2).
+      // Sehingga exponent untuk simulasi log-normal adalah: drift + volatility * Z.
+      const exponent = drift + volatility * Z;
       const sSim = S0 * Math.exp(exponent);
       simulatedPrices.push(sSim);
     }
