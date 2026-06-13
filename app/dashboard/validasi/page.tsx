@@ -230,8 +230,8 @@ export default function ValidasiPage() {
                         {item.kodeSaham}
                         <HelpCircle size={12} className="text-slate-400 group-hover:text-indigo-600 transition" />
                       </span>
-                      {/* Tooltip Hover Premium */}
-                      <div className="absolute left-6 top-12 z-20 hidden w-64 rounded-xl border border-slate-200 bg-slate-900 p-3 text-2xs text-slate-200 leading-relaxed group-hover:block shadow-2xl">
+                      {/* Tooltip Hover Premium — muncul di atas baris */}
+                      <div className="absolute left-6 bottom-full mb-2 z-50 hidden w-64 rounded-xl border border-slate-200 bg-slate-900 p-3 text-2xs text-slate-200 leading-relaxed group-hover:block shadow-2xl">
                         <span className="font-bold text-white block mb-1">Analisis Statistik {item.kodeSaham}:</span>
                         Berdasarkan {item.jumlahSampel} sampel, dipercaya 95% bahwa rata-rata harga prediksi berada di kisaran <strong>Rp {item.confidenceInterval.batasBawah}</strong> sampai dengan <strong>Rp {item.confidenceInterval.batasAtas}</strong>.
                       </div>
