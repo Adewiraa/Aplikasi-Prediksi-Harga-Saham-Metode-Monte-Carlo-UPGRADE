@@ -100,6 +100,9 @@ export default function DashboardPage() {
           <h2 className="mt-4 text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
             Prediksi Pergerakan Harga Saham
           </h2>
+          <p className="mt-3 text-sm text-indigo-200/90 leading-relaxed font-medium">
+            Simulasikan proyeksi harga masa depan emiten LQ45 menggunakan metode stokastik <strong>Geometric Brownian Motion (GBM)</strong>. Lakukan uji iterasi Monte Carlo secara real-time untuk memetakan jalur probabilitas harga dan menguji keandalan model melalui metrik galat MAPE & RMSE.
+          </p>
 
           <div className="mt-6 flex flex-wrap gap-4">
             <Link 
