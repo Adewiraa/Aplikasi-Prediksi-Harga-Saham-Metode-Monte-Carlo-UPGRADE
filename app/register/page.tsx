@@ -38,7 +38,7 @@ export default function RegisterPage() {
         .eq('username', email.trim());
 
       if (checkError) {
-        setErrorMsg('Gagal memeriksa data pengguna.');
+        setErrorMsg('Gagal memeriksa data pengguna: ' + checkError.message);
         setLoading(false);
         return;
       }
