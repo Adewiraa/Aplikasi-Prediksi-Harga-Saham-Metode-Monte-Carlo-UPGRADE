@@ -74,7 +74,8 @@ export default function SahamPage() {
       const resJson = await res.json();
       
       if (!resJson.success) {
-        throw new Error(resJson.message || 'Gagal memuat daftar saham.');
+        const detail = resJson.error ? ` (Detail: ${resJson.error})` : '';
+        throw new Error(`${resJson.message}${detail}`);
       }
 
       const formattedStocks = resJson.data.map((stock: any) => ({
