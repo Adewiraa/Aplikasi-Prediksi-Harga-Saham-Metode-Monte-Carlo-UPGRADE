@@ -100,9 +100,7 @@ export default function DashboardPage() {
           <h2 className="mt-4 text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
             Prediksi Pergerakan Harga Saham
           </h2>
-          <p className="mt-4 text-indigo-100 leading-relaxed font-medium">
-            Selamat datang di Sistem Prediksi Saham Monte Carlo menggunakan model **Geometric Brownian Motion (GBM)**. Sistem berjalan tanpa backend eksternal, terintegrasi langsung dengan database PostgreSQL di Supabase cloud.
-          </p>
+
           <div className="mt-6 flex flex-wrap gap-4">
             <Link 
               href="/dashboard/prediksi" 
