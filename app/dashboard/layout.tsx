@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-slate-900">
-              {user.user_metadata?.full_name || user.email?.split('@')[0]}
+              {user.nama || user.username}
             </p>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-2xs font-bold border ${

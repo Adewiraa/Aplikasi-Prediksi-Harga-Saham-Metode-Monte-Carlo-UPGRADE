@@ -15,7 +15,7 @@ export default function RegisterPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signIn } = useAuth();
 
   // Redirect jika sudah login
   useEffect(() => {
@@ -31,31 +31,54 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-            role: role,
-          },
-        },
-      });
+      // 1. Cek apakah username/email sudah terdaftar di tabel 'user'
+      const { data: existingUser, error: checkError } = await supabase
+        .from('user')
+        .select('id')
+        .eq('username', email.trim());
+
+      if (checkError) {
+        setErrorMsg('Gagal memeriksa data pengguna.');
+        setLoading(false);
+        return;
+      }
+
+      if (existingUser && existingUser.length > 0) {
+        setErrorMsg('Email/Username sudah terdaftar.');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Insert user baru ke dalam tabel 'user' kustom di Supabase
+      const { data, error } = await supabase
+        .from('user')
+        .insert([
+          {
+            nama: name,
+            username: email.trim(),
+            password: password, // Menyimpan teks biasa untuk kemudahan testing tugas skripsi
+            level: role === 'admin' ? 'Admin' : 'User'
+          }
+        ])
+        .select()
+        .single();
 
       if (error) {
         setErrorMsg(error.message);
       } else {
-        if (data.session) {
-          setSuccessMsg('Pendaftaran berhasil! Mengarahkan ke dashboard...');
-          setTimeout(() => {
-            router.push('/dashboard');
-          }, 1500);
-        } else {
-          setSuccessMsg('Pendaftaran berhasil! Silakan langsung login (atau cek email jika verifikasi email aktif).');
-          setName('');
-          setEmail('');
-          setPassword('');
-        }
+        setSuccessMsg('Pendaftaran berhasil! Mengarahkan ke dashboard...');
+        
+        // Simpan sesi dan langsung arahkan ke dashboard
+        signIn({
+          id: data.id,
+          nama: data.nama,
+          username: data.username,
+          level: data.level
+        });
+
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1500);
       }
     } catch (err: any) {
       setErrorMsg('Terjadi kesalahan koneksi.');
@@ -122,7 +145,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-slate-700">
-                Alamat Email
+                Alamat Email / Username
               </label>
               <div className="mt-1">
                 <input
@@ -190,7 +213,7 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600 font-medium">
               Sudah memiliki akun?{' '}
-              <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+              <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-550">
                 Masuk disini
               </Link>
             </p>

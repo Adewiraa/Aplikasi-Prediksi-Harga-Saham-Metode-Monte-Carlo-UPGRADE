@@ -1,116 +1,68 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from './supabase';
-import { User, Session } from '@supabase/supabase-js';
+
+interface CustomUser {
+  id: string | number;
+  nama: string;
+  username: string;
+  level: 'Admin' | 'User';
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: CustomUser | null;
   role: 'admin' | 'user' | null;
   loading: boolean;
-  signOut: () => Promise<void>;
-  signInDemo: (email: string, name: string, role: 'admin' | 'user') => void;
+  signIn: (userData: CustomUser) => void;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  session: null,
   role: null,
   loading: true,
-  signOut: async () => {},
-  signInDemo: () => {},
+  signIn: () => {},
+  signOut: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<CustomUser | null>(null);
   const [role, setRole] = useState<'admin' | 'user' | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cek apakah ada sesi demo offline di localStorage
-    const localUser = typeof window !== 'undefined' ? localStorage.getItem('mock_user') : null;
-    const localRole = typeof window !== 'undefined' ? localStorage.getItem('mock_role') : null;
-
-    if (localUser) {
-      setUser(JSON.parse(localUser));
-      setRole((localRole as 'admin' | 'user') || 'admin');
-      setLoading(false);
-    } else {
-      // 1. Ambil session saat ini dari Supabase
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setRole(session.user.user_metadata?.role || 'admin');
-        }
-        setLoading(false);
-      });
-    }
-
-    // 2. Dengarkan perubahan auth state Supabase
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        // Jika ada user mock offline, abaikan perubahan auth state Supabase
-        if (typeof window !== 'undefined' && localStorage.getItem('mock_user')) {
-          return;
-        }
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setRole(session.user.user_metadata?.role || 'admin');
-        } else {
-          setRole(null);
-        }
-        setLoading(false);
+    // Muat session dari localStorage saat inisialisasi
+    const storedSession = typeof window !== 'undefined' ? localStorage.getItem('custom_session_user') : null;
+    if (storedSession) {
+      try {
+        const userData = JSON.parse(storedSession) as CustomUser;
+        setUser(userData);
+        setRole(userData.level.toLowerCase() as 'admin' | 'user');
+      } catch (err) {
+        console.error('Failed to parse user session:', err);
       }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    }
+    setLoading(false);
   }, []);
 
-  const signOut = async () => {
-    setLoading(true);
+  const signIn = (userData: CustomUser) => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('mock_user');
-      localStorage.removeItem('mock_role');
+      localStorage.setItem('custom_session_user', JSON.stringify(userData));
     }
-    try {
-      await supabase.auth.signOut();
-    } catch (err) {
-      // Abaikan jika offline/error
-    }
-    setUser(null);
-    setSession(null);
-    setRole(null);
-    setLoading(false);
+    setUser(userData);
+    setRole(userData.level.toLowerCase() as 'admin' | 'user');
   };
 
-  const signInDemo = (email: string, name: string, role: 'admin' | 'user') => {
-    const mockUser = {
-      id: 'mock-id-12345',
-      email,
-      user_metadata: {
-        full_name: name,
-        role: role
-      }
-    } as any;
-
+  const signOut = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('mock_user', JSON.stringify(mockUser));
-      localStorage.setItem('mock_role', role);
+      localStorage.removeItem('custom_session_user');
     }
-
-    setUser(mockUser);
-    setRole(role);
-    setLoading(false);
+    setUser(null);
+    setRole(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, loading, signOut, signInDemo }}>
+    <AuthContext.Provider value={{ user, role, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
