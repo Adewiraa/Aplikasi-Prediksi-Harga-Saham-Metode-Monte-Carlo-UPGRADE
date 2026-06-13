@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Monte Carlo - Prediksi Harga Saham</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #161d30;
+            --bg-tertiary: #1f2942;
+            --accent-primary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #60a5fa 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Sidebar Inputs */
+        .sidebar {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: fit-content;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+            position: relative;
+            padding-left: 0.75rem;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            height: 70%;
+            width: 4px;
+            background-color: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .input-wrapper .unit {
+            position: absolute;
+            right: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .btn-simulate {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #1d4ed8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-simulate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-simulate:active {
+            transform: translateY(0);
+        }
+
+        /* Content Area */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Summary Cards Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--border-color);
+        }
+
+        .metric-card.primary::after { background-color: var(--accent-primary); }
+        .metric-card.success::after { background-color: var(--accent-success); }
+        .metric-card.danger::after { background-color: var(--accent-danger); }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .metric-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Charts Section */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1100px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Explanation Section */
+        .info-card {
+            background-color: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .formula-box {
+            background-color: var(--bg-tertiary);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 1rem;
+            text-align: center;
+            overflow-x: auto;
+            color: #60a5fa;
+        }
+
+        .info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .info-list li::before {
+            content: "•";
+            color: var(--accent-primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+            top: -2px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">MC</div>
+            <div class="logo-text">
+                <h1>Monte Carlo Stock Simulator</h1>
+                <p>Prediksi Harga Saham Berbasis Geometric Brownian Motion (GBM)</p>
+            </div>
+        </div>
+        <div>
+            <span class="badge">Model: GBM (1-Day Step)</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sidebar Inputs -->
+        <div class="sidebar">
+            <div class="section-title">Parameter Simulasi</div>
+            
+            <div class="input-group">
+                <label for="currentPrice">Harga Saham Saat Ini ($S_0$)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="currentPrice" value="10000" min="1" step="1">
+                    <span class="unit">Rp</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="drift">Drift Harian (Expected Return, $\mu$)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="drift" value="0.05" step="0.01">
+                    <span class="unit">%</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="volatility">Volatilitas Harian ($\sigma$)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="volatility" value="1.50" min="0.01" step="0.01">
+                    <span class="unit">%</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="simulations">Jumlah Jalur Simulasi ($N$)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="simulations" value="1000" min="10" max="10000">
+                    <span class="unit">paths</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="forecastDays">Hari Proyeksi ($t$)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="forecastDays" value="30" min="1" max="120">
+                    <span class="unit">hari</span>
+                </div>
+            </div>
+
+            <button class="btn-simulate" id="btnSimulate">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px;">
+                    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                    <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                </svg>
+                Jalankan Simulasi
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Metrics Row -->
+            <div class="metrics-grid">
+                <div class="metric-card primary">
+                    <div class="metric-label">Prediksi Rata-rata</div>
+                    <div class="metric-value" id="valMean">Rp 10.150</div>
+                    <div class="metric-desc" id="valMeanDesc">Ekspektasi harga di hari ke-30</div>
+                </div>
+                <div class="metric-card success">
+                    <div class="metric-label">Batas Atas (95% CI)</div>
+                    <div class="metric-value" id="valUpper">Rp 11.230</div>
+                    <div class="metric-desc">Peluang harga di bawah ini adalah 97.5%</div>
+                </div>
+                <div class="metric-card danger">
+                    <div class="metric-label">Batas Bawah (95% CI)</div>
+                    <div class="metric-value" id="valLower">Rp 9.120</div>
+                    <div class="metric-desc">Peluang harga di atas ini adalah 97.5%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Peluang Naik Esok Hari</div>
+                    <div class="metric-value" id="valUpProb" style="color: var(--accent-success);">52.3%</div>
+                    <div class="metric-desc">Probabilitas harga esok > harga hari ini</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="section-title">Jalur Proyeksi Harga (Monte Carlo Paths)</div>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Hanya menampilkan 50 jalur pertama untuk kejelasan visual</span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="pathsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="section-title">Distribusi Harga Target</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="distChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info & Math Explanations -->
+            <div class="info-card">
+                <div class="section-title">Bagaimana Simulasi Ini Bekerja?</div>
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+                    Simulasi ini menggunakan model matematika **Geometric Brownian Motion (GBM)**, standar industri untuk memodelkan fluktuasi harga instrumen keuangan. Harga saham esok hari dihitung menggunakan persamaan diferensial stokastik berikut:
+                </p>
+                <div class="formula-box">
+                    S_t = S_{t-1} * exp( (μ - 0.5 * σ²) + σ * Z )
+                </div>
+                <ul class="info-list" style="color: var(--text-secondary);">
+                    <li><strong>$S_t$ & $S_{t-1}$:</strong> Harga saham pada hari $t$ dan hari sebelumnya.</li>
+                    <li><strong>$exp$:</strong> Fungsi eksponensial alamiah ($e^x$).</li>
+                    <li><strong>$\mu$ (Drift Harian):</strong> Rata-rata tingkat keuntungan harian berdasarkan data historis saham. Merepresentasikan arah tren jangka panjang.</li>
+                    <li><strong>$\sigma$ (Volatilitas Harian):</strong> Standar deviasi dari keuntungan harian. Menggambarkan intensitas risiko atau kejutan fluktuasi harga saham.</li>
+                    <li><strong>$Z$:</strong> Nilai acak acak dari distribusi normal standar (Mean = 0, Std Dev = 1), dihasilkan menggunakan algoritma <i>Box-Muller Transform</i> di setiap langkah simulasi. Komponen ini merepresentasikan "berita mengejutkan" (market shocks) yang tidak terduga setiap harinya.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Aplikasi Simulasi Monte Carlo Saham - Dibuat untuk Keperluan Akademik & Skripsi</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const currentPriceInput = document.getElementById('currentPrice');
+        const driftInput = document.getElementById('drift');
+        const volatilityInput = document.getElementById('volatility');
+        const simulationsInput = document.getElementById('simulations');
+        const forecastDaysInput = document.getElementById('forecastDays');
+        const btnSimulate = document.getElementById('btnSimulate');
+
+        const valMean = document.getElementById('valMean');
+        const valMeanDesc = document.getElementById('valMeanDesc');
+        const valUpper = document.getElementById('valUpper');
+        const valLower = document.getElementById('valLower');
+        const valUpProb = document.getElementById('valUpProb');
+
+        // Charts instances
+        let pathsChartInstance = null;
+        let distChartInstance = null;
+
+        // Box-Muller Transform to generate Standard Normal random variables (Z ~ N(0, 1))
+        function randomNormal() {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random(); // Mengabaikan nol
+            while(v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+
+        // Run Monte Carlo Simulation
+        function runSimulation() {
+            const S0 = parseFloat(currentPriceInput.value);
+            const drift = parseFloat(driftInput.value) / 100; // ubah dari persen ke desimal
+            const sigma = parseFloat(volatilityInput.value) / 100; // ubah dari persen ke desimal
+            const numSimulations = parseInt(simulationsInput.value);
+            const days = parseInt(forecastDaysInput.value);
+
+            // Perubahan deskripsi target hari
+            valMeanDesc.textContent = `Ekspektasi harga di hari ke-${days}`;
+
+            // Simpan seluruh jalur simulasi
+            // Ukuran array: [numSimulations] x [days + 1]
+            const allPaths = [];
+            
+            // Loop untuk setiap simulasi (path)
+            for (let i = 0; i < numSimulations; i++) {
+                const path = [S0];
+                let currentP = S0;
+                for (let t = 1; t <= days; t++) {
+                    const Z = randomNormal();
+                    // Rumus GBM: S_t = S_{t-1} * exp( (mu - 0.5 * sigma^2) + sigma * Z )
+                    const exponent = (drift - 0.5 * Math.pow(sigma, 2)) + sigma * Z;
+                    currentP = currentP * Math.exp(exponent);
+                    path.push(currentP);
+                }
+                allPaths.push(path);
+            }
+
+            // Dapatkan seluruh harga pada hari esok (Hari ke-1) dan hari target (Hari terakhir)
+            const tomorrowPrices = allPaths.map(p => p[1]);
+            const targetPrices = allPaths.map(p => p[days]);
+
+            // Hitung statistik
+            // 1. Peluang naik esok hari (harga besok > harga hari ini S0)
+            const upCount = tomorrowPrices.filter(p => p > S0).length;
+            const upProbability = (upCount / numSimulations) * 100;
+            valUpProb.textContent = `${upProbability.toFixed(1)}%`;
+            valUpProb.style.color = upProbability >= 50 ? 'var(--accent-success)' : 'var(--accent-danger)';
+
+            // 2. Statistik harga target akhir (hari terakhir)
+            targetPrices.sort((a, b) => a - b);
+            
+            // Rata-rata (mean)
+            const sum = targetPrices.reduce((a, b) => a + b, 0);
+            const mean = sum / numSimulations;
+            valMean.textContent = formatRupiah(mean);
+
+            // Interval Kepercayaan 95% (Persentil 2.5% dan 97.5%)
+            const lowerIdx = Math.floor(numSimulations * 0.025);
+            const upperIdx = Math.floor(numSimulations * 0.975);
+            const lowerBound = targetPrices[lowerIdx];
+            const upperBound = targetPrices[upperIdx];
+
+            valLower.textContent = formatRupiah(lowerBound);
+            valUpper.textContent = formatRupiah(upperBound);
+
+            // Update Grafik Jalur (Tampilkan maks 50 jalur pertama saja agar tidak lag)
+            updatePathsChart(allPaths.slice(0, 50), days);
+            
+            // Update Grafik Distribusi Target
+            updateDistributionChart(targetPrices, mean, lowerBound, upperBound);
+        }
+
+        function formatRupiah(value) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        // Render atau update line chart untuk visualisasi jalur simulasi
+        function updatePathsChart(paths, days) {
+            const ctx = document.getElementById('pathsChart').getContext('2d');
+            
+            // Siapkan labels (Hari 0, Hari 1, ..., Hari t)
+            const labels = Array.from({length: days + 1}, (_, i) => `Hari ${i}`);
+
+            // Buat dataset untuk setiap jalur
+            const datasets = paths.map((path, index) => {
+                return {
+                    label: `Jalur ${index + 1}`,
+                    data: path,
+                    borderColor: index === 0 ? 'rgba(59, 130, 246, 0.8)' : 'rgba(59, 130, 246, 0.08)',
+                    borderWidth: index === 0 ? 2.5 : 1,
+                    pointRadius: 0,
+                    fill: false
+                };
+            });
+
+            if (pathsChartInstance) {
+                pathsChartInstance.destroy();
+            }
+
+            pathsChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false } // Sembunyikan legenda karena terlalu banyak dataset
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { family: 'Outfit' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { 
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                font: { family: 'Outfit' },
+                                callback: function(value) {
+                                    return formatRupiah(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render atau update histogram distribusi harga akhir
+        function updateDistributionChart(prices, mean, lowerBound, upperBound) {
+            const ctx = document.getElementById('distChart').getContext('2d');
+
+            // Kelompokkan harga akhir ke dalam bins untuk membuat histogram
+            const numBins = 25;
+            const min = prices[0];
+            const max = prices[prices.length - 1];
+            const binWidth = (max - min) / numBins;
+
+            const bins = Array(numBins).fill(0);
+            const binLabels = [];
+
+            for (let i = 0; i < numBins; i++) {
+                const binStart = min + i * binWidth;
+                const binEnd = binStart + binWidth;
+                binLabels.push(`${Math.round(binStart)}`);
+            }
+
+            prices.forEach(price => {
+                let binIndex = Math.floor((price - min) / binWidth);
+                if (binIndex >= numBins) binIndex = numBins - 1;
+                bins[binIndex]++;
+            });
+
+            // Warnai chart: bagian di luar 95% Confidence Interval diberi warna kemerahan
+            const backgroundColors = [];
+            for (let i = 0; i < numBins; i++) {
+                const binCenter = min + (i + 0.5) * binWidth;
+                if (binCenter < lowerBound || binCenter > upperBound) {
+                    backgroundColors.push('rgba(239, 68, 68, 0.5)'); // Merah (ekstrem)
+                } else {
+                    backgroundColors.push('rgba(16, 185, 129, 0.6)'); // Hijau (zona keyakinan 95%)
+                }
+            }
+
+            if (distChartInstance) {
+                distChartInstance.destroy();
+            }
+
+            distChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: binLabels,
+                    datasets: [{
+                        label: 'Frekuensi Hasil',
+                        data: bins,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 0,
+                        barPercentage: 0.9,
+                        categoryPercentage: 0.9
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                color: 'rgba(255, 255, 255, 0.5)', 
+                                font: { family: 'Outfit', size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { family: 'Outfit' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        btnSimulate.addEventListener('click', runSimulation);
+
+        // Initial Run on Load
+        window.addEventListener('load', runSimulation);
+    </script>
+</body>
+</html>
