@@ -24,6 +24,35 @@ export default function ValidasiPage() {
   const [loading, setLoading] = useState(true);
   const [syncingActuals, setSyncingActuals] = useState(false);
 
+  // Tooltip state — posisi fixed agar tidak terpotong
+  const [tooltipData, setTooltipData] = useState<{
+    show: boolean;
+    x: number;
+    y: number;
+    kodeSaham: string;
+    jumlahSampel: number;
+    batasBawah: string;
+    batasAtas: string;
+  } | null>(null);
+
+  const handleTooltipEnter = (e: React.MouseEvent, item: any) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    // Tampilkan tooltip di sebelah kanan ikon, sejajar vertikal
+    setTooltipData({
+      show: true,
+      x: rect.right + 8,
+      y: rect.top + rect.height / 2,
+      kodeSaham: item.kodeSaham,
+      jumlahSampel: item.jumlahSampel,
+      batasBawah: item.confidenceInterval.batasBawah,
+      batasAtas: item.confidenceInterval.batasAtas,
+    });
+  };
+
+  const handleTooltipLeave = () => {
+    setTooltipData(null);
+  };
+
   // Custom Alert Modal State
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
@@ -223,18 +252,17 @@ export default function ValidasiPage() {
                 </tr>
               ) : validationData.length > 0 ? (
                 validationData.map((item, idx) => (
-                  <tr key={item.kodeSaham} className="text-sm text-slate-700 hover:bg-slate-50/50 group">
+                  <tr key={item.kodeSaham} className="text-sm text-slate-700 hover:bg-slate-50/50">
                     <td className="px-6 py-4 text-slate-400">{idx + 1}</td>
-                    <td className="px-6 py-4 font-mono font-bold text-slate-950 relative">
-                      <span className="flex items-center gap-1 cursor-help">
+                    <td className="px-6 py-4 font-mono font-bold text-slate-950">
+                      <span
+                        className="inline-flex items-center gap-1 cursor-help"
+                        onMouseEnter={(e) => handleTooltipEnter(e, item)}
+                        onMouseLeave={handleTooltipLeave}
+                      >
                         {item.kodeSaham}
-                        <HelpCircle size={12} className="text-slate-400 group-hover:text-indigo-600 transition" />
+                        <HelpCircle size={12} className="text-slate-400 hover:text-indigo-600 transition" />
                       </span>
-                      {/* Tooltip Hover Premium — muncul di atas baris */}
-                      <div className="absolute left-6 bottom-full mb-2 z-50 hidden w-64 rounded-xl border border-slate-200 bg-slate-900 p-3 text-2xs text-slate-200 leading-relaxed group-hover:block shadow-2xl">
-                        <span className="font-bold text-white block mb-1">Analisis Statistik {item.kodeSaham}:</span>
-                        Berdasarkan {item.jumlahSampel} sampel, dipercaya 95% bahwa rata-rata harga prediksi berada di kisaran <strong>Rp {item.confidenceInterval.batasBawah}</strong> sampai dengan <strong>Rp {item.confidenceInterval.batasAtas}</strong>.
-                      </div>
                     </td>
                     <td className="px-6 py-4 font-semibold text-slate-900">{item.jumlahSampel} Hari</td>
                     <td className="px-6 py-4 font-mono">Rp {item.rataRata.toLocaleString('id-ID')}</td>
@@ -381,6 +409,20 @@ export default function ValidasiPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Tooltip Fixed — mengambang bebas di viewport */}
+      {tooltipData && (
+        <div
+          className="fixed z-[200] w-64 rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs text-slate-200 leading-relaxed shadow-2xl pointer-events-none"
+          style={{
+            left: `${Math.min(tooltipData.x, window.innerWidth - 280)}px`,
+            top: `${tooltipData.y - 50}px`,
+          }}
+        >
+          <span className="font-bold text-white block mb-1">Analisis Statistik {tooltipData.kodeSaham}:</span>
+          Berdasarkan {tooltipData.jumlahSampel} sampel, dipercaya 95% bahwa rata-rata harga prediksi berada di kisaran <strong>Rp {tooltipData.batasBawah}</strong> sampai dengan <strong>Rp {tooltipData.batasAtas}</strong>.
         </div>
       )}
 
