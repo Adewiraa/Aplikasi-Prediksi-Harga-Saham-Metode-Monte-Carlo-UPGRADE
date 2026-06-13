@@ -13,7 +13,9 @@ import {
   Menu, 
   X,
   User as UserIcon,
-  ShieldCheck
+  ShieldCheck,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +23,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDark = localStorage.getItem('theme') === 'dark';
+    setDarkMode(isDark);
+    if (isDark) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const nextDark = !darkMode;
+    setDarkMode(nextDark);
+    if (nextDark) {
+      document.body.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   // Redirect ke login jika tidak ada user
   useEffect(() => {
@@ -149,6 +174,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={toggleDarkMode}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 transition duration-150 cursor-pointer"
+              title="Toggle Dark/Light Mode"
+            >
+              {darkMode ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} />}
+            </button>
             <span className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-3 py-1 font-mono font-semibold">
               Serverless Node API
             </span>
