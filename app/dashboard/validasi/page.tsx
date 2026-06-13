@@ -417,7 +417,7 @@ export default function ValidasiPage() {
         <div
           className="fixed z-[200] w-64 rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs text-slate-200 leading-relaxed shadow-2xl pointer-events-none"
           style={{
-            left: `${Math.min(tooltipData.x, window.innerWidth - 280)}px`,
+            left: `${Math.min(tooltipData.x, typeof window !== 'undefined' ? window.innerWidth - 280 : 1000)}px`,
             top: `${tooltipData.y - 50}px`,
           }}
         >
